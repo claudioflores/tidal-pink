@@ -312,6 +312,10 @@ final class FocusRing {
     void onKey(int keyCode) {
         lastKey = android.os.SystemClock.uptimeMillis();
         if (!barScreen()) return;
+        // Left / Right on a player with its buttons hidden skip or restart the song and leave the buttons hidden:
+        // the ring stays away too.
+        if (PLAYER.equals(screen) && idle && (keyCode == android.view.KeyEvent.KEYCODE_DPAD_LEFT
+                || keyCode == android.view.KeyEvent.KEYCODE_DPAD_RIGHT)) return;
         // Back with the buttons up hides them at once in Tidal's player: the ring and marker go with them.
         if (PLAYER.equals(screen) && keyCode == android.view.KeyEvent.KEYCODE_BACK) {
             handler.removeCallbacks(goIdle);
