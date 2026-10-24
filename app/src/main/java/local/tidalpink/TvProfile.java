@@ -1,4 +1,4 @@
-package local.tvfocus;
+package local.tidalpink;
 
 import android.content.Context;
 import android.graphics.Color;

@@ -1,4 +1,4 @@
-# tidal-tv-focus
+# Tidal Pink
 
 A small Android TV accessibility service (no icon, no screen) for a TCL 75QM751G running Google TV 14, built
 alongside the [CleanYourTV](https://github.com/Gathin23/cleanyourtv) launcher.
@@ -47,4 +47,4 @@ refuses to start the service ("forbid bind service" in logcat).
 
 ## Remove
 
-    TV_HOST=192.168.4.44 tools/venv/bin/python -I tools/tv.py 'pm uninstall local.tvfocus'
+    TV_HOST=192.168.4.44 tools/venv/bin/python -I tools/tv.py 'pm uninstall local.tidalpink'
