@@ -204,6 +204,37 @@ final class FocusRing {
         handler.postDelayed(refresh, SETTLE_MS);
     }
 
+    /** Buttons only one Tidal screen has: they tell which screen is up when no window change said so. */
+    private static final String[] PLAYER_ONLY_IDS = {
+            "playPauseButton", "previousButton", "nextButton", "favoriteButton", "hiFiButton", "lyricsButton",
+    };
+    private static final String[] LYRICS_ONLY_IDS = {"back", "previous", "play", "next"};
+    private static final String[] PLAYLIST_ONLY_IDS = {"playButton"};
+    /** When a remote key last came in, in any app. */
+    private long lastKey;
+
+    /**
+     * Tidal has focus but no window change named its screen: the TV woke up with Tidal already up. Work the
+     * screen out from the focused button, so the shapes for that screen apply instead of plain boxes.
+     */
+    private void inferScreen(String id) {
+        String name = id != null && id.startsWith(TIDAL_PACKAGE + ":id/") ? id.substring(TIDAL_PACKAGE.length() + 4) : "";
+        String found = TIDAL_PACKAGE + "/unknown";
+        for (String own : PLAYER_ONLY_IDS) if (own.equals(name)) found = PLAYER;
+        for (String own : LYRICS_ONLY_IDS) if (own.equals(name)) found = LYRICS;
+        for (String own : PLAYLIST_ONLY_IDS) if (own.equals(name)) found = PLAYLIST;
+        screen = found;
+        screenSince = android.os.SystemClock.uptimeMillis();
+        if (PLAYER.equals(screen)) {
+            // The player's buttons are up only if a key just woke them; otherwise they are faded.
+            long sinceKey = screenSince - lastKey;
+            idle = sinceKey > 1000;
+            handler.removeCallbacks(goIdle);
+            if (!idle) handler.postDelayed(goIdle, PLAYER_IDLE_MS - sinceKey);
+        }
+        if (barScreen() && !idle) handler.post(thumbTick);
+    }
+
     private void refresh() {
         AccessibilityNodeInfo node = service.findFocus(AccessibilityNodeInfo.FOCUS_INPUT);
         if (node == null) {
@@ -214,6 +245,7 @@ final class FocusRing {
         if (!isTidal(pkg)) {
             hide();
         } else {
+            if (!screen.startsWith(TIDAL_PACKAGE + "/")) inferScreen(node.getViewIdResourceName());
             node.getBoundsInScreen(bounds);
             if (shown && bounds.equals(shownBounds)) {
                 // Still where the ring is: leave it up.
@@ -278,6 +310,7 @@ final class FocusRing {
 
     /** Every remote key, from FocusService: in the player a key brings the buttons back and restarts their timer. */
     void onKey(int keyCode) {
+        lastKey = android.os.SystemClock.uptimeMillis();
         if (!barScreen()) return;
         // Back with the buttons up hides them at once in Tidal's player: the ring and marker go with them.
         if (PLAYER.equals(screen) && keyCode == android.view.KeyEvent.KEYCODE_BACK) {
