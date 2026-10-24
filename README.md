@@ -43,7 +43,7 @@ Kinds: `circle`, `pill`, `rounded`, `frame`. Screens: `player`, `lyrics`, `playl
 
 ## Install
 
-    TV_HOST=192.168.4.44 JAVA_HOME=/path/to/jdk17 ANDROID_HOME=/path/to/sdk ./install.sh
+    TV_HOST=192.168.1.50 JAVA_HOME=/path/to/jdk17 ANDROID_HOME=/path/to/sdk ./install.sh
 
 Network/USB debugging must be on while installing. Turn it off afterwards; the service keeps working.
 Tested on the TCL 75QM751G on 23 October 2026 with Tidal 2.215.0 (build 10019): the service starts and the ring
@@ -54,4 +54,4 @@ refuses to start the service ("forbid bind service" in logcat).
 
 ## Remove
 
-    TV_HOST=192.168.4.44 tools/venv/bin/python -I tools/tv.py 'pm uninstall local.tidalpink'
+    TV_HOST=192.168.1.50 tools/venv/bin/python -I tools/tv.py 'pm uninstall local.tidalpink'

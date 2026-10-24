@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Build the app, install it on the TV over network ADB and switch its accessibility service on, keeping any
 # other services already on (the launcher's key helper).
-# Usage: TV_HOST=192.168.4.44 ./install.sh      (needs JAVA_HOME = JDK 17 and ANDROID_HOME with platform 34)
+# Usage: TV_HOST=192.168.1.50 ./install.sh      (needs JAVA_HOME = JDK 17 and ANDROID_HOME with platform 34)
 set -euo pipefail
 cd "$(dirname "$0")"
 : "${TV_HOST:?set TV_HOST to the TV IP address}"
