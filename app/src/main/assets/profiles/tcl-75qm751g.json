@@ -1,0 +1,48 @@
+{
+  "name": "TCL 75QM751G (QM7 2024, Google TV 14, device G08), Tidal TV app as of October 2026",
+  "match": {
+    "device": ["G08"]
+  },
+  "measuredWidthPx": 1920,
+
+  "color": "#FF10F0",
+  "ringDp": 6,
+  "cornerDp": 12,
+
+  "timing": {
+    "playerIdleMs": 4300,
+    "enterQuietMs": 400,
+    "fromTidalMinMs": 1000,
+    "thumbQuietMs": 300,
+    "preshowMs": 250,
+    "undoToggleMs": 0,
+    "holdLeftMs": 450
+  },
+
+  "thumb": {
+    "insetPx": 32,
+    "widthPx": 12,
+    "growPx": 4
+  },
+
+  "shapes": [
+    { "screen": "any",      "id": "title_orb",       "kind": "circle", "insetPx": [0, 0, 0, 0] },
+
+    { "screen": "player",   "id": "shuffleButton",   "kind": "circle", "insetPx": [12, 12, 12, 12] },
+    { "screen": "player",   "id": "previousButton",  "kind": "circle", "insetPx": [12, 12, 12, 12] },
+    { "screen": "player",   "id": "playPauseButton", "kind": "circle", "insetPx": [12, 12, 12, 12] },
+    { "screen": "player",   "id": "nextButton",      "kind": "circle", "insetPx": [12, 12, 12, 12] },
+    { "screen": "player",   "id": "favoriteButton",  "kind": "circle", "insetPx": [12, 12, 12, 12] },
+    { "screen": "player",   "id": "hiFiButton",      "kind": "frame",  "insetPx": [-3, 0, 1, 1], "cornerPx": 34,
+      "innerInsetPx": [12, 24, 17, 25], "innerCornerPx": 12 },
+    { "screen": "player",   "id": "lyricsButton",    "kind": "pill",   "insetPx": [16, 16, 16, 16], "strokePx": 16 },
+
+    { "screen": "lyrics",   "id": "back",            "kind": "circle", "insetPx": [0, 0, 0, 0] },
+    { "screen": "lyrics",   "id": "previous",        "kind": "circle", "insetPx": [0, 0, 0, 0] },
+    { "screen": "lyrics",   "id": "play",            "kind": "circle", "insetPx": [0, 0, 0, 0] },
+    { "screen": "lyrics",   "id": "next",            "kind": "circle", "insetPx": [0, 0, 0, 0] },
+
+    { "screen": "playlist", "id": "playButton",      "kind": "rounded", "insetPx": [16, 0, 16, 53], "cornerPx": 12 },
+    { "screen": "playlist", "id": "shuffleButton",   "kind": "rounded", "insetPx": [16, 0, 16, 53], "cornerPx": 12 }
+  ]
+}

@@ -16,8 +16,9 @@ public class FocusService extends AccessibilityService {
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
-        if (focusRing == null) focusRing = new FocusRing(this);
-        if (menuJump == null) menuJump = new MenuJump(this);
+        TvProfile profile = TvProfile.load(this);
+        if (focusRing == null) focusRing = new FocusRing(this, profile);
+        if (menuJump == null) menuJump = new MenuJump(this, profile);
     }
 
     @Override

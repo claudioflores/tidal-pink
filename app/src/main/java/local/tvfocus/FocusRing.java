@@ -21,15 +21,17 @@ import android.view.accessibility.AccessibilityNodeInfo;
  */
 final class FocusRing {
 
-    private static final int COLOR = 0xFFFF10F0;
+    /** Pixel sizes, timings and colour for this TV: assets/profiles/, see TvProfile. */
+    private final TvProfile profile;
+    private final int color;
     /** After focus moves, wait this long, then check the focused view every SAMPLE_MS until it stops moving:
      *  focus zoom and list scrolling move it for a moment, and a ring placed early jumps twice. */
     private static final long SETTLE_MS = 15, SAMPLE_MS = 20;
     private static final int MAX_SAMPLES = 45;
     /** How long a newly opened screen takes to slide in; the ring waits for it. */
-    private static final long ENTER_QUIET_MS = 400;
+    private final long ENTER_QUIET_MS;
     /** A Tidal screen up at least this long was one the user was on, not one flashed while Tidal starts. */
-    private static final long FROM_TIDAL_MIN_MS = 1000;
+    private final long FROM_TIDAL_MIN_MS;
     private long screenSince;
     private long enterQuietUntil;
     /** Screens where only the buttons in SHAPES get a ring (Tidal's playlists). */
@@ -47,42 +49,18 @@ final class FocusRing {
     private static final String LYRICS = "com.aspiro.tidal/androidx.activity.ComponentDialog";
     private static final String SEEK_BAR_ID = "com.aspiro.tidal:id/seekBar";
     private static final String PLAY_PAUSE_ID = "com.aspiro.tidal:id/playPauseButton";
-    /** Tidal's marker is 12 px wide and the SeekBar's height; the pink one is THUMB_GROW px bigger each way,
-     *  from the same centre, so it still covers the white one in the frame it takes to catch up. */
-    private static final int THUMB_INSET = 32, THUMB_W = 12, THUMB_GROW = 4;
+    /** Where the bar starts inside the SeekBar, Tidal's marker width, and how much bigger each way the pink one
+     *  is (same centre), so it still covers the white one in the frame it takes to catch up. */
+    private final int THUMB_INSET, THUMB_W, THUMB_GROW;
     /** The row the remote selects: the bar with its two times. */
     private static final String SEEK_ROW_ID = "com.aspiro.tidal:id/seekBarAndTime";
     private static final long THUMB_IDLE_CHECK_MS = 16;
     /** After a key that moves focus, how long the marker stays away while Tidal's focus animation runs. */
-    private static final long THUMB_QUIET_MS = 300;
+    private final long THUMB_QUIET_MS;
     private long thumbQuietUntil;
     private static final String PLAYLIST = "com.aspiro.tidal/com.aspiro.wamp.tv.playlist.PlaylistActivity";
-    /**
-     * Buttons whose ring hugs the visible shape instead of the view's box: screen ("" for any), view id, and
-     * the shape inside the view's bounds, in screen pixels measured on the 75QM751G (1920x1080).
-     */
-    private static final Shape[] SHAPES = {
-            // Tidal's search lens: a filled circle the size of its view.
-            new Shape("", "com.aspiro.tidal:id/title_orb", Shape.CIRCLE, 0, 0, 0, 0, 0),
-            // Player: bare icons get a circle around them; quality and Lyrics grow to fill their view when focused.
-            new Shape(PLAYER, "com.aspiro.tidal:id/shuffleButton", Shape.CIRCLE, 12, 12, 12, 12, 0),
-            new Shape(PLAYER, "com.aspiro.tidal:id/previousButton", Shape.CIRCLE, 12, 12, 12, 12, 0),
-            new Shape(PLAYER, "com.aspiro.tidal:id/playPauseButton", Shape.CIRCLE, 12, 12, 12, 12, 0),
-            new Shape(PLAYER, "com.aspiro.tidal:id/nextButton", Shape.CIRCLE, 12, 12, 12, 12, 0),
-            new Shape(PLAYER, "com.aspiro.tidal:id/favoriteButton", Shape.CIRCLE, 12, 12, 12, 12, 0),
-            // Lyrics: focused buttons get a grey circle the size of their view; the ring hugs it.
-            new Shape(LYRICS, "com.aspiro.tidal:id/back", Shape.CIRCLE, 0, 0, 0, 0, 0),
-            new Shape(LYRICS, "com.aspiro.tidal:id/previous", Shape.CIRCLE, 0, 0, 0, 0, 0),
-            new Shape(LYRICS, "com.aspiro.tidal:id/play", Shape.CIRCLE, 0, 0, 0, 0, 0),
-            new Shape(LYRICS, "com.aspiro.tidal:id/next", Shape.CIRCLE, 0, 0, 0, 0, 0),
-            // Quality: focused, a grey frame (15-24 px, uneven) appears round the inner pill; paint that frame pink.
-            Shape.frame(PLAYER, "com.aspiro.tidal:id/hiFiButton", -3, 0, 1, 1, 34, 12, 24, 17, 25, 12),
-            // Lyrics: a 16 px grey band appears round the pill when focused; a ring exactly that thick covers it.
-            new Shape(PLAYER, "com.aspiro.tidal:id/lyricsButton", Shape.PILL, 16, 16, 16, 16, 0, 16),
-            // Playlist: Play and Shuffle are rounded squares (iconBackground) above their label.
-            new Shape(PLAYLIST, "com.aspiro.tidal:id/playButton", Shape.ROUNDED, 16, 0, 16, 53, 12),
-            new Shape(PLAYLIST, "com.aspiro.tidal:id/shuffleButton", Shape.ROUNDED, 16, 0, 16, 53, 12),
-    };
+    /** Buttons whose ring hugs the visible shape instead of the view's box, from the profile's "shapes". */
+    private final Shape[] SHAPES;
     /** The screen in front, as package/class from the last window change. */
     private String screen = "";
 
@@ -105,7 +83,7 @@ final class FocusRing {
     private final Runnable refresh = this::refresh;
     /** Tidal's player fades its buttons out this long after the last key, with no event and focus kept:
      *  the ring goes with them, on a timer the remote's keys restart (measured: about 5 s). */
-    private static final long PLAYER_IDLE_MS = 4300;
+    private final long PLAYER_IDLE_MS;
     /** When a key last reached the player, for its fade timer (which keeps running under lyrics). */
     private long lastPlayerKey;
     /** The player's buttons have faded: no ring until a key brings them back. */
@@ -124,12 +102,58 @@ final class FocusRing {
     /** The marker follows on every display frame (vsync), the fastest it can be redrawn. */
     private final android.view.Choreographer.FrameCallback thumbFrame = frameTimeNanos -> thumbTick();
 
-    FocusRing(AccessibilityService service) {
+    FocusRing(AccessibilityService service, TvProfile profile) {
         this.service = service;
+        this.profile = profile;
         windows = (WindowManager) service.getSystemService(Context.WINDOW_SERVICE);
         density = service.getResources().getDisplayMetrics().density;
-        pad = Math.round(6 * density);
+        pad = Math.round(profile.ringDp * density);
+        color = profile.color;
+        ENTER_QUIET_MS = profile.enterQuietMs;
+        FROM_TIDAL_MIN_MS = profile.fromTidalMinMs;
+        THUMB_INSET = profile.thumbInset;
+        THUMB_W = profile.thumbWidth;
+        THUMB_GROW = profile.thumbGrow;
+        THUMB_QUIET_MS = profile.thumbQuietMs;
+        PLAYER_IDLE_MS = profile.playerIdleMs;
+        UNDO_TOGGLE_MS = profile.undoToggleMs;
+        PRESHOW_MS = profile.preshowMs;
+        SHAPES = shapes(profile);
         thumb = new Thumb();
+    }
+
+    /** Profile screen names to Tidal screens; "any" matches every screen. */
+    private static String screenOf(String name) {
+        switch (name) {
+            case "player": return PLAYER;
+            case "lyrics": return LYRICS;
+            case "playlist": return PLAYLIST;
+            default: return "";
+        }
+    }
+
+    private static Shape[] shapes(TvProfile profile) {
+        Shape[] out = new Shape[profile.shapes.size()];
+        for (int i = 0; i < out.length; i++) {
+            TvProfile.ShapeSpec s = profile.shapes.get(i);
+            String screen = screenOf(s.screen), id = "com.aspiro.tidal:id/" + s.id;
+            int[] in = s.inset;
+            switch (s.kind) {
+                case "circle":
+                    out[i] = new Shape(screen, id, Shape.CIRCLE, in[0], in[1], in[2], in[3], 0, s.stroke);
+                    break;
+                case "pill":
+                    out[i] = new Shape(screen, id, Shape.PILL, in[0], in[1], in[2], in[3], 0, s.stroke);
+                    break;
+                case "frame":
+                    int[] h = s.innerInset;
+                    out[i] = Shape.frame(screen, id, in[0], in[1], in[2], in[3], s.corner, h[0], h[1], h[2], h[3], s.innerCorner);
+                    break;
+                default:
+                    out[i] = new Shape(screen, id, Shape.ROUNDED, in[0], in[1], in[2], in[3], s.corner, s.stroke);
+            }
+        }
+        return out;
     }
 
     /** The only app the ring is drawn in. */
@@ -210,7 +234,7 @@ final class FocusRing {
      * Tidal show them any other way (it ignores taps, and the helper cannot send keys), so OK goes through and
      * play/pause is clicked right back: OK on a hidden player only shows the buttons.
      */
-    private static final long UNDO_TOGGLE_MS = 0;
+    private final long UNDO_TOGGLE_MS;
     private final Runnable undoToggle = this::undoToggle;
 
     private void focusPlayPause() {
@@ -343,7 +367,7 @@ final class FocusRing {
             "com.aspiro.tidal:id/lyricsButton",
     };
     /** How long a marker put up ahead of the focus may wait for the bar to be selected. */
-    private static final long PRESHOW_MS = 250;
+    private final long PRESHOW_MS;
     private long preshowUntil;
 
     private void preshowThumb(int keyCode) {
@@ -505,7 +529,7 @@ final class FocusRing {
             private final Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
 
             {
-                fill.setColor(COLOR);
+                fill.setColor(color);
             }
 
             @Override
@@ -605,8 +629,8 @@ final class FocusRing {
         RingView(Context context) {
             super(context);
             paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(6 * density);
-            paint.setColor(COLOR);
+            paint.setStrokeWidth(pad);
+            paint.setColor(color);
         }
 
         void setShape(Shape shape, int stroke) {
@@ -641,7 +665,7 @@ final class FocusRing {
             float r;
             if (shape != null && shape.kind == Shape.PILL) r = h / 2f - half;
             else if (shape != null) r = shape.corner + paint.getStrokeWidth() - half;
-            else r = 12 * density;
+            else r = profile.cornerDp * density;
             canvas.drawRoundRect(half, half, w - half, h - half, r, r, paint);
         }
     }

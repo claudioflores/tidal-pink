@@ -15,14 +15,16 @@ final class MenuJump {
 
     private static final String PACKAGE = "com.aspiro.tidal";
     private static final String MENU_ID = "com.aspiro.tidal:id/browse_headers";
-    private static final long HOLD_MS = 450;
+    /** How long Left must be held, from the TV profile. */
+    private final long holdMs;
 
     private final AccessibilityService service;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable jump = this::jump;
 
-    MenuJump(AccessibilityService service) {
+    MenuJump(AccessibilityService service, TvProfile profile) {
         this.service = service;
+        holdMs = profile.holdLeftMs;
     }
 
     /** Watches Left in Tidal; always returns false, so the key still reaches the app. */
@@ -30,7 +32,7 @@ final class MenuJump {
         if (event.getKeyCode() != KeyEvent.KEYCODE_DPAD_LEFT) return false;
         if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
             handler.removeCallbacks(jump);
-            if (screen.startsWith(PACKAGE + "/")) handler.postDelayed(jump, HOLD_MS);
+            if (screen.startsWith(PACKAGE + "/")) handler.postDelayed(jump, holdMs);
         } else if (event.getAction() == KeyEvent.ACTION_UP) {
             handler.removeCallbacks(jump);
         }

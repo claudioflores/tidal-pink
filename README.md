@@ -12,8 +12,29 @@ Tidal TV app only; every other app is left alone.
 - OK on a hidden player shows the buttons without pausing (Tidal pauses, the service resumes at once)
 - Hold Left jumps to the left menu
 
-Measurements (insets, sizes, timers) are in pixels on this TV's 1920x1080 screen; other TVs or Tidal
-versions will need them redone.
+## TV profiles
+
+Everything that depends on the TV lives in `app/src/main/assets/profiles/*.json`: the ring colour and
+thickness, timings, the progress-marker sizes and each button's shape (insets from its view's bounds, in screen
+pixels). Tidal's view ids and screens stay in the code, since they follow the Tidal version, not the TV.
+
+At start the service picks the profile whose `match.device` or `match.model` equals the TV's `ro.product.device`
+or `ro.product.model`. With no match it uses the first profile, its pixel values scaled from `measuredWidthPx`
+to the screen's width, a starting point that still needs checking.
+
+To add a TV, copy `tcl-75qm751g.json`, set `match` to the TV's values (`tools/tv.py --probe` prints them), and
+re-measure on screenshots:
+
+| Key | What to measure |
+| --- | --- |
+| `shapes[].insetPx` | `[left, top, right, bottom]` from the focused view's bounds to the visible button edge |
+| `shapes[].cornerPx`, `strokePx` | the button's corner radius; a ring thickness for buttons with a focus band to cover |
+| `shapes[].innerInsetPx`, `innerCornerPx` | `frame` shapes only: the hole inside the focus band |
+| `thumb.insetPx`, `widthPx` | where the bar starts inside the SeekBar, and the width of Tidal's white marker |
+| `timing.playerIdleMs` | how long after the last key the player's buttons start to fade |
+| `timing.enterQuietMs`, `fromTidalMinMs` | screen slide-in time; how long a Tidal screen must be up to count as visited |
+
+Kinds: `circle`, `pill`, `rounded`, `frame`. Screens: `player`, `lyrics`, `playlist`, `any`.
 
 ## Install
 
