@@ -15,11 +15,9 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 /**
- * A thick electric-pink ring drawn over other apps around whatever has input focus, so the remote's
- * "cursor" is easy to find outside Home. Driven by FocusService's focus, scroll and window events.
- * Only apps built from standard Android views report their focus; apps that draw their own UI (Kodi,
- * games, some players) report none and show no ring. Home has its own highlight, so it is skipped there,
- * and a focused view that fills most of the screen (a video surface) gets no ring either.
+ * A thick electric-pink ring drawn over Tidal's TV app around whatever has input focus, so the remote's
+ * "cursor" is easy to find. Driven by FocusService's focus, scroll and window events. Every other app is
+ * left alone, and a focused view that fills most of the screen gets no ring.
  */
 final class FocusRing {
 
@@ -134,18 +132,19 @@ final class FocusRing {
         thumb = new Thumb();
     }
 
-    /** Home (the CleanYourTV launcher) draws its own pink highlight: no ring there. */
-    private static final String HOME_PACKAGE = "com.gathin.tvhome";
+    /** The only app the ring is drawn in. */
+    private static final String TIDAL_PACKAGE = "com.aspiro.tidal";
 
-    private boolean ownOrHome(CharSequence pkg) {
-        return pkg != null && (service.getPackageName().contentEquals(pkg) || HOME_PACKAGE.contentEquals(pkg));
+    private static boolean isTidal(CharSequence pkg) {
+        return pkg != null && TIDAL_PACKAGE.contentEquals(pkg);
     }
 
     void onEvent(AccessibilityEvent event) {
         CharSequence pkg = event.getPackageName();
         // Adding the ring's own overlay window reports a window change under this package: ignore it.
         if (pkg != null && service.getPackageName().contentEquals(pkg)) return;
-        if (pkg != null && HOME_PACKAGE.contentEquals(pkg)) {
+        if (!isTidal(pkg)) {
+            // Another app: no ring. Window changes still count, so the screen state is right on the way back.
             if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_FOCUSED) hide();
             if (event.getEventType() != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return;
         }
@@ -188,7 +187,7 @@ final class FocusRing {
             return;
         }
         CharSequence pkg = node.getPackageName();
-        if (ownOrHome(pkg)) {
+        if (!isTidal(pkg)) {
             hide();
         } else {
             node.getBoundsInScreen(bounds);

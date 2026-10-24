@@ -3,17 +3,14 @@
 A small Android TV accessibility service (no icon, no screen) for a TCL 75QM751G running Google TV 14, built
 alongside the [CleanYourTV](https://github.com/Gathin23/cleanyourtv) launcher.
 
-- **Pink focus ring:** a thick electric-pink outline around whatever is selected in apps built from standard
-  Android views (Settings, SmartTube, Tidal, VLC, Aerial Views). Apps that draw their own screens (HBO Max,
-  Apple TV, Prime Video, Kodi) report no selection, so they get no ring. Skipped on the CleanYourTV home screen,
-  which has its own highlight.
-- **Tidal:**
-  - rings shaped to each button (circles, pills, the quality and Lyrics focus frames painted pink), in the
-    player, lyrics and playlists; no ring in the left menu or on playlist rows
-  - pink progress marker while the bar is selected, following every frame
-  - the ring hides with the player's buttons (about 4.3 s after the last key, or on Back)
-  - OK on a hidden player shows the buttons without pausing (Tidal pauses, the service resumes at once)
-  - Hold Left jumps to the left menu
+Tidal TV app only; every other app is left alone.
+
+- Pink focus ring, shaped to each button (circles, pills, the quality and Lyrics focus frames painted pink), in
+  the player, lyrics and playlists; no ring in the left menu or on playlist rows
+- Pink progress marker while the bar is selected, following every frame
+- The ring hides with the player's buttons (about 4.3 s after the last key, or on Back)
+- OK on a hidden player shows the buttons without pausing (Tidal pauses, the service resumes at once)
+- Hold Left jumps to the left menu
 
 Measurements (insets, sizes, timers) are in pixels on this TV's 1920x1080 screen; other TVs or Tidal
 versions will need them redone.
