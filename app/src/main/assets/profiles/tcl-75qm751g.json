@@ -1,5 +1,6 @@
 {
-  "name": "TCL 75QM751G (QM7 2024, Google TV 14, device G08), Tidal TV app as of October 2026",
+  "name": "TCL 75QM751G (QM7 2024, Google TV 14, device G08), Tidal TV app 2.215.0",
+  "tidalVersion": "2.215.0 (build 10019)",
   "match": {
     "device": ["G08"]
   },

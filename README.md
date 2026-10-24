@@ -46,7 +46,8 @@ Kinds: `circle`, `pill`, `rounded`, `frame`. Screens: `player`, `lyrics`, `playl
     TV_HOST=192.168.4.44 JAVA_HOME=/path/to/jdk17 ANDROID_HOME=/path/to/sdk ./install.sh
 
 Network/USB debugging must be on while installing. Turn it off afterwards; the service keeps working.
-Tested on the TCL 75QM751G on 23 October 2026: the service starts and the ring shows in Tidal.
+Tested on the TCL 75QM751G on 23 October 2026 with Tidal 2.215.0 (build 10019): the service starts and the ring
+shows in Tidal. Other Tidal versions may rename views or change sizes.
 
 On TCL TVs install.sh also gives the app TCL's AUTO_START permission; without it the firmware (TclAppBoot)
 refuses to start the service ("forbid bind service" in logcat).
