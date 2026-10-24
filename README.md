@@ -1,7 +1,12 @@
 # Tidal Pink
 
-A small Android TV accessibility service (no icon, no screen) for a TCL 75QM751G running Google TV 14, built
-alongside the [CleanYourTV](https://github.com/Gathin23/cleanyourtv) launcher.
+An add-on for Tidal's Android TV app: a small accessibility service that draws on top of Tidal and reacts to the
+remote. Tidal itself is not modified, and the add-on does nothing without it. Made for a TCL 75QM751G running
+Google TV 14, alongside the [CleanYourTV](https://github.com/Gathin23/cleanyourtv) launcher, but it does not
+need that launcher.
+
+It has no icon, so Google TV's app list does not show it. It appears as "Tidal Pink" under Settings > System >
+Accessibility.
 
 Tidal TV app only; every other app is left alone.
 
@@ -41,6 +46,7 @@ Kinds: `circle`, `pill`, `rounded`, `frame`. Screens: `player`, `lyrics`, `playl
     TV_HOST=192.168.4.44 JAVA_HOME=/path/to/jdk17 ANDROID_HOME=/path/to/sdk ./install.sh
 
 Network/USB debugging must be on while installing. Turn it off afterwards; the service keeps working.
+Tested on the TCL 75QM751G on 23 October 2026: the service starts and the ring shows in Tidal.
 
 On TCL TVs install.sh also gives the app TCL's AUTO_START permission; without it the firmware (TclAppBoot)
 refuses to start the service ("forbid bind service" in logcat).
