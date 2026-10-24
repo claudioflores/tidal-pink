@@ -42,9 +42,8 @@ Kinds: `circle`, `pill`, `rounded`, `frame`. Screens: `player`, `lyrics`, `playl
 
 Network/USB debugging must be on while installing. Turn it off afterwards; the service keeps working.
 
-Known issue: on this TCL, the firmware's TclAppBoot blocks the service from starting ("forbid bind service")
-because the app has no screen and has never been opened. Not fixed yet; the same code currently runs inside the
-CleanYourTV launcher's key helper instead.
+On TCL TVs install.sh also gives the app TCL's AUTO_START permission; without it the firmware (TclAppBoot)
+refuses to start the service ("forbid bind service" in logcat).
 
 ## Remove
 
